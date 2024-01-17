@@ -27,7 +27,7 @@ def run_nyt_etl():
             list_of_articles = []
             for article in articles:
                 refined_article = {
-                    'section': article.get("section", ""),
+                    #'section': article.get("section", ""),
                     'title': article.get("title", ""),
                     'abstract': article.get("abstract", ""),
                     'url': article.get("url", ""),
