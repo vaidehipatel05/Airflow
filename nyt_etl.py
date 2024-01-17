@@ -6,7 +6,7 @@ from datetime import datetime
 def run_nyt_etl():
 
     # Replace 'your_api_key' with your actual New York Times API key
-    api_key = 'AnCh9flYvZIQYG72yC2oM6TTVVISp1Xl'
+    api_key = ''
     api_url = 'https://api.nytimes.com/svc/topstories/v2/science.json'
 
     params = {
