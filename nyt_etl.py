@@ -2,6 +2,9 @@ import requests
 import pandas as pd
 from datetime import datetime
 #import s3fs 
+import boto3
+from botocore.exceptions import NoCredentialsError
+from io import StringIO 
 
 def run_nyt_etl():
 
@@ -39,13 +42,27 @@ def run_nyt_etl():
             # Convert the list of articles to a DataFrame
             df = pd.DataFrame(list_of_articles)
 
-            # Save DataFrame to CSV
-            df.to_csv('refined_articles.csv', index=False)
-            # Print the DataFrame
-            print(df)
+            # Save DataFrame to CSV in-memory
+            csv_buffer = StringIO()
+            df.to_csv(csv_buffer, index=False)
+            
+            # Upload CSV buffer to AWS S3
+            upload_to_s3(csv_buffer.getvalue(), 'airflow-nyt', 'refined_articles.csv')
+
         else:
             print(f"API returned an error: {data.get('status')}")
 
     else:
         # Print an error message if the request was not successful
         print(f"Error: {response.status_code} - {response.text}")
+
+
+def upload_to_s3(csv_data, bucket_name='airflow-nyt', object_name='refined_articles.csv'):
+
+    s3 = boto3.client('s3')
+
+    try:
+        s3.put_object(Body=csv_data, Bucket=bucket_name, Key=object_name)
+        print(f"CSV data uploaded to {bucket_name}/{object_name}")
+    except NoCredentialsError:
+        print("Credentials not available or incorrect")
